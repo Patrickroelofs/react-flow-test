@@ -15,6 +15,13 @@ let json = {
   "questions": [],
 }
 
+interface Question {
+  id: string;
+  type: string;
+  label: string;
+  goto?: string;
+}
+
 export default function Home() {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -22,15 +29,39 @@ export default function Home() {
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const onConnect = useCallback((params: Edge<any> | Connection) =>  {
     console.log(params);
+    const index = json.questions.findIndex((question: Question) => question.id === params.source);
+    const item = json.questions.find((question: Question) => question.id === params.source);
+    
+    if(!item) return;
+    
+    switch(item.type) {
+      case 'startNode': 
+        item.goto = params.target;
+        json.questions[index] = item;
+        break;
+      case 'booleanQuestion':
+        if(!item.options) {
+          item.options = [];
+        }
 
-    const index = json.questions.findIndex((question) => question.id === params.source);
-    const item = json.questions.find((question) => question.id === params.source);
-    item.goto = params.target;
-
-    json.questions[index] = item;
+        if(params.sourceHandle === "a") {
+          item.options.push({
+            "label": "Yes",
+            "goto": params.target
+          });
+        } else if (params.sourceHandle === "b") {
+          item.options.push({
+            "label": "No",
+            "goto": params.target
+          });
+        }
+        break;
+      default:
+        console.log("default")
+        break;
+    }
 
     console.log(json);
-
     setEdges((eds) => addEdge(params, eds));
   }, [setEdges]);
 
@@ -73,9 +104,6 @@ export default function Home() {
       };
 
       id++;
-      console.log(id);
-
-      console.log(json);
       setNodes((nds) => nds.concat(newNode));
     },
     [reactFlowInstance, setNodes]

@@ -1,7 +1,6 @@
 import { DragEvent, useCallback, useRef, useState } from "react";
 import { addEdge, Node, Edge, ReactFlow, updateEdge, useEdgesState, useNodesState, Connection, ReactFlowProvider } from "reactflow";
 import 'reactflow/dist/style.css';
-import { StartNode } from 'components/startNode.js';
 import { BooleanNode }  from "components/booleanNode.js";
 import { SideBar } from "@/components/SideBar";
 import JSONPreview from "@/components/jsonPreview";
@@ -9,7 +8,7 @@ import JSONPreview from "@/components/jsonPreview";
 const initialNodes: Node<any, string | undefined>[] = []
 const initialEdges: Edge<any>[] = [];
 
-const nodeTypes = { startNode: StartNode, booleanQuestion: BooleanNode };
+const nodeTypes = { booleanQuestion: BooleanNode };
 
 let id = 0;
 let json = {

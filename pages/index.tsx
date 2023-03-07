@@ -11,14 +11,28 @@ const initialEdges: Edge<any>[] = [];
 const nodeTypes = { startNode: StartNode, booleanQuestion: BooleanNode };
 
 let id = 0;
-const getId = () => `${id++}`;
+let json = {
+  "questions": [],
+}
 
 export default function Home() {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const onConnect = useCallback((params: Edge<any> | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const onConnect = useCallback((params: Edge<any> | Connection) =>  {
+    console.log(params);
+
+    const index = json.questions.findIndex((question) => question.id === params.source);
+    const item = json.questions.find((question) => question.id === params.source);
+    item.goto = params.target;
+
+    json.questions[index] = item;
+
+    console.log(json);
+
+    setEdges((eds) => addEdge(params, eds));
+  }, [setEdges]);
 
   const onDragOver = useCallback((event: { preventDefault: () => void; dataTransfer: { dropEffect: string; }; }) => {
     event.preventDefault();
@@ -40,29 +54,32 @@ export default function Home() {
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
+
+      json.questions.push({
+        id: `${id}`,
+        type: type,
+        label: `${type} node`,
+      })
+      
       const newNode = {
-        id: getId(),
+        id: `${id}`,
         type,
         position,
         data: { 
           label: `${type} node`,
-          id: id,
+          id: `${id}`,
           type: type
       },
       };
 
+      id++;
+      console.log(id);
+
+      console.log(json);
       setNodes((nds) => nds.concat(newNode));
     },
     [reactFlowInstance, setNodes]
   );
-
-  const onSave = useCallback(() => {
-    if (reactFlowInstance) {
-      const flow = reactFlowInstance.toObject();
-      console.log(flow);
-      localStorage.setItem("Flow", JSON.stringify(flow));
-    }
-  }, [reactFlowInstance]);
 
   return (
     <div className="w-screen h-screen">
@@ -84,7 +101,7 @@ export default function Home() {
           fitView
         />
         </div>
-        <SideBar onSave={onSave} />
+        <SideBar />
       </ReactFlowProvider>
     </div>
   );

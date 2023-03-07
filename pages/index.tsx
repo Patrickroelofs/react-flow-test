@@ -4,6 +4,7 @@ import 'reactflow/dist/style.css';
 import { StartNode } from 'components/startNode.js';
 import { BooleanNode }  from "components/booleanNode.js";
 import { SideBar } from "@/components/SideBar";
+import JSONPreview from "@/components/jsonPreview";
 
 const initialNodes: Node<any, string | undefined>[] = []
 const initialEdges: Edge<any>[] = [];
@@ -130,6 +131,7 @@ export default function Home() {
         />
         </div>
         <SideBar />
+        <JSONPreview json={json} />
       </ReactFlowProvider>
     </div>
   );
